@@ -473,7 +473,7 @@ c
          read (string,*,err=10,end=10)  w5scale
          if (w5scale .gt. 1.0d0)  w5scale = 1.0d0 / w5scale
 c
-c     set control parameters and flag for exchind potentials
+c     set control parameters and flag for exind potentials
 c
       else if (keyword(1:18) .eq. 'POLARREP-12-SCALE ') then
          read (string,*,err=10,end=10)  pr2scale
@@ -511,8 +511,6 @@ c
       else if (keyword(1:19) .eq. 'INDUCEREP-15-SCALE ') then
          read (string,*,err=10,end=10)  wr5scale
          if (wr5scale .gt. 1.0d0)  wr5scale = 1.0d0 / wr5scale
-      else if (keyword(1:9) .eq. 'EXCH-IND ') then
-         exchind = .true.
 c
 c     set control parameters for charge transfer potentials
 c

@@ -581,9 +581,9 @@ c
       use polgrp
       use polpot
       use shunt
-c     modules for exchind
+c     modules for exind
       use chgpot
-      use repel
+      use exind
       implicit none
       integer i,j,k,m
       integer ii,kk
@@ -613,7 +613,7 @@ c     modules for exchind
       real*8 field(3,*)
       real*8 fieldp(3,*)
       character*6 mode
-c     variables for exchind
+c     variables for exind
       real*8 f
       real*8 frid(3),frkd(3)
       real*8 rr1,rr9,rr11
@@ -633,7 +633,7 @@ c
          end do
       end do
 c
-c     zero out the value of the field due to exchind at each site
+c     zero out the value of the field due to exind at each site
 c
       do j = 1, 3
          frid(j) = 0.0d0
@@ -679,10 +679,10 @@ c
             vali = pval(ii)
             alphai = palpha(ii)
          end if
-         if (exchind) then
-            rsizi = sizpr(ii) / f
-            rdmpi = dmppr(ii)
-            rvali = elepr(ii)
+         if (use_exind) then
+            rsizi = sizpei(ii) / f
+            rdmpi = dmppei(ii)
+            rvali = elepei(ii)
          end if
 c
 c     set exclusion coefficients for connected atoms
@@ -864,10 +864,10 @@ c
                   fkd(3) = zr*(rr3*corei + rr3i*vali
      &                        + rr5i*dir + rr7i*qir)
      &                        - rr3i*diz - 2.0d0*rr5i*qiz
-                  if (exchind) then
-                     rsizk = sizpr(kk) / f
-                     rdmpk = dmppr(kk)
-                     rvalk = elepr(kk)
+                  if (use_exind) then
+                     rsizk = sizpei(kk) / f
+                     rdmpk = dmppei(kk)
+                     rvalk = elepei(kk)
                      rr1 = 1.0d0 / r
                      call damprep (r,r2,rr1,rr3,rr5,rr7,rr9,rr11,
      &                             7,rdmpi,rdmpk,rdmpik)
@@ -1256,9 +1256,9 @@ c
       use polgrp
       use polpot
       use shunt
-c     modules for exchind
+c     modules for exind
       use chgpot
-      use repel
+      use exind
       implicit none
       integer i,j,k,m
       integer ii,kk
@@ -1281,7 +1281,7 @@ c     modules for exchind
       real*8 field(3,*)
       real*8 fieldp(3,*)
       character*6 mode
-c     variables for exchind
+c     variables for exind
       real*8 f
       real*8 frid(3),frkd(3)
       real*8 frip(3),frkp(3)
@@ -1301,7 +1301,7 @@ c
          end do
       end do
 c
-c     zero out the value of the field due to exchind at each site
+c     zero out the value of the field due to exind at each site
 c
       do j = 1, 3
          frid(j) = 0.0d0
@@ -1344,9 +1344,9 @@ c
             corei = pcore(ii)
             vali = pval(ii)
             alphai = palpha(ii)
-            if (exchind) then
-               rsizi = sizpr(ii) / f
-               rdmpi = dmppr(ii)
+            if (use_exind) then
+               rsizi = sizpei(ii) / f
+               rdmpi = dmppei(ii)
             end if
          end if
 c
@@ -1440,9 +1440,9 @@ c
                fkp(1) = rr3*pix + rr5*pir*xr
                fkp(2) = rr3*piy + rr5*pir*yr
                fkp(3) = rr3*piz + rr5*pir*zr
-               if (exchind) then
-                  rsizk = sizpr(kk) / f
-                  rdmpk = dmppr(kk)
+               if (use_exind) then
+                  rsizk = sizpei(kk) / f
+                  rdmpk = dmppei(kk)
                   rr1 = 1.0d0 / r
                   rr3 = rr1 / r2
                   rr5 = 3.0d0 * rr3 / r2

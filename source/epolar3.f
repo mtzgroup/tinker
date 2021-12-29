@@ -25,7 +25,7 @@ c
 c
 c     choose the method for summing over polarization interactions
 c
-      if (exchind) then
+      if (use_exind) then
          pairwise = .false.
       else
          pairwise = .true.

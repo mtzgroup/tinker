@@ -22,14 +22,14 @@ c     p2iscale     scale factor for 1-2 intragroup polarization energy
 c     p3iscale     scale factor for 1-3 intragroup polarization energy
 c     p4iscale     scale factor for 1-4 intragroup polarization energy
 c     p5iscale     scale factor for 1-5 intragroup polarization energy
-c     pr2scale     scale factor for 1-2 exchind energy interactions
-c     pr3scale     scale factor for 1-3 exchind energy interactions
-c     pr4scale     scale factor for 1-4 exchind energy interactions
-c     pr5scale     scale factor for 1-5 exchind energy interactions
-c     pr2iscale    scale factor for 1-2 intragroup exchind energy
-c     pr3iscale    scale factor for 1-3 intragroup exchind energy
-c     pr4iscale    scale factor for 1-4 intragroup exchind energy
-c     pr5iscale    scale factor for 1-5 intragroup exchind energy
+c     pr2scale     scale factor for 1-2 exind energy interactions
+c     pr3scale     scale factor for 1-3 exind energy interactions
+c     pr4scale     scale factor for 1-4 exind energy interactions
+c     pr5scale     scale factor for 1-5 exind energy interactions
+c     pr2iscale    scale factor for 1-2 intragroup exind energy
+c     pr3iscale    scale factor for 1-3 intragroup exind energy
+c     pr4iscale    scale factor for 1-4 intragroup exind energy
+c     pr5iscale    scale factor for 1-5 intragroup exind energy
 c     d1scale      scale factor for intra-group direct induction
 c     d2scale      scale factor for 1-2 group direct induction
 c     d3scale      scale factor for 1-3 group direct induction
@@ -42,16 +42,16 @@ c     w2scale      scale factor for 1-2 induced dipole interactions
 c     w3scale      scale factor for 1-3 induced dipole interactions
 c     w4scale      scale factor for 1-4 induced dipole interactions
 c     w5scale      scale factor for 1-5 induced dipole interactions
-c     wr2scale     scale factor for 1-2 induced exchind dipole interactions
-c     wr3scale     scale factor for 1-3 induced exchind dipole interactions
-c     wr4scale     scale factor for 1-4 induced exchind dipole interactions
-c     wr5scale     scale factor for 1-5 induced exchind dipole interactions
+c     wr2scale     scale factor for 1-2 induced exind dipole interaction
+c     wr3scale     scale factor for 1-3 induced exind dipole interaction
+c     wr4scale     scale factor for 1-4 induced exind dipole interaction
+c     wr5scale     scale factor for 1-5 induced exind dipole interaction
 c     udiag        acceleration factor for induced dipole SCF iterations
 c     polprt       flag to print summary of induced dipole iterations
 c     dpequal      flag to set dscale values equal to pscale values
 c     use_thole    flag to use Thole damped polarization interactions
 c     use_dirdamp  flag to use damped direct polarization interactions
-c     exchind      flag to use repulsive field when computing induced dipoles
+c     use_exind    flag to use repulsive field in induced dipole routine
 c     poltyp       type of polarization (MUTUAL, DIRECT, OPT or TCG)
 c
 c
@@ -80,7 +80,7 @@ c
       logical dpequal
       logical use_thole
       logical use_dirdamp
-      logical exchind
+      logical use_exind
       character*6 poltyp
       save
       end

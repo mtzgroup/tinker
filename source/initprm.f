@@ -35,6 +35,7 @@ c
       use kctrn
       use kdipol
       use kdsp
+      use kexnd
       use khbond
       use kiprop
       use kitors
@@ -213,6 +214,9 @@ c
       if (.not. allocated(prsiz))  allocate (prsiz(maxclass))
       if (.not. allocated(prdmp))  allocate (prdmp(maxclass))
       if (.not. allocated(prele))  allocate (prele(maxclass))
+      if (.not. allocated(peisiz))  allocate (peisiz(maxclass))
+      if (.not. allocated(peidmp))  allocate (peidmp(maxclass))
+      if (.not. allocated(peiele))  allocate (peiele(maxclass))
       if (.not. allocated(dspsix))  allocate (dspsix(maxclass))
       if (.not. allocated(dspdmp))  allocate (dspdmp(maxclass))
       if (.not. allocated(chg))  allocate (chg(maxtyp))
@@ -268,6 +272,9 @@ c
          prsiz(i) = 0.0d0
          prdmp(i) = 0.0d0
          prele(i) = 0.0d0
+         peisiz(i) = 0.0d0
+         peidmp(i) = 0.0d0
+         peiele(i) = 0.0d0
          dspsix(i) = 0.0d0
          dspdmp(i) = 0.0d0
          cpele(i) = 0.0d0
@@ -418,7 +425,7 @@ c
       use_pred = .false.
       use_ielscf = .false.
       dpequal = .false.
-      exchind = .false.
+      use_exind = .true.
 c
 c     set default control parameters for charge transfer terms
 c

@@ -56,6 +56,7 @@ c
       use kcpen
       use kctrn
       use kdsp
+      use kexnd
       use korbs
       use kpolr
       use krepl
@@ -474,6 +475,12 @@ c     deallocation of global arrays from module kdsp
 c
       if (allocated(dspsix))  deallocate (dspsix)
       if (allocated(dspdmp))  deallocate (dspdmp)
+c
+c     deallocation of global arrays from module kexnd
+c
+      if (allocated(peisiz))  deallocate (peisiz)
+      if (allocated(peidmp))  deallocate (peidmp)
+      if (allocated(peiele))  deallocate (peiele)
 c
 c     deallocation of global arrays from module korbs
 c

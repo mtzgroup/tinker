@@ -84,8 +84,8 @@ c
       use potent
       use shunt
       use virial
-c     modules for exchind
-      use repel
+c     modules for exind
+      use exind
       implicit none
       integer i,j,k,m
       integer ii,kk,jcell
@@ -170,7 +170,7 @@ c     modules for exchind
       real*8, allocatable :: decfy(:)
       real*8, allocatable :: decfz(:)
       character*6 mode
-c     variables for exchind
+c     variables for exind
       real*8 uik,diuk,dkui
       real*8 uiqk,ukqi
       real*8 uiqkx,uiqky,uiqkz
@@ -302,10 +302,10 @@ c
             corei = pcore(ii)
             vali = pval(ii)
             alphai = palpha(ii)
-            if (exchind) then
-               rsizi = sizpr(ii)
-               rdmpi = dmppr(ii)
-               rvali = elepr(ii)
+            if (use_exind) then
+               rsizi = sizpei(ii)
+               rdmpi = dmppei(ii)
+               rvali = elepei(ii)
             end if
          end if
 c
@@ -593,10 +593,10 @@ c
 c
 c     get repulsion damping factors
 c
-               if (exchind) then
-                  rsizk = sizpr(kk)
-                  rdmpk = dmppr(kk)
-                  rvalk = elepr(kk)
+               if (use_exind) then
+                  rsizk = sizpei(kk)
+                  rdmpk = dmppei(kk)
+                  rvalk = elepei(kk)
                   rsizik = rsizi*rsizk
                   rrr1 = 1.0d0 / r
                   rrr3 = rrr1 / r2
@@ -649,7 +649,7 @@ c
                ufld(1,k) = ufld(1,k) + tkx3 + xr*tukr
                ufld(2,k) = ufld(2,k) + tky3 + yr*tukr
                ufld(3,k) = ufld(3,k) + tkz3 + zr*tukr
-               if (exchind) then
+               if (use_exind) then
                   term1 = rdmpik(3) * rrr1
                   term2 = rdmpik(5)*rrr1
                   rufld1i = -xr * term2 * ukr + term1 * ukx
@@ -705,7 +705,7 @@ c
                dufld(5,k) = dufld(5,k) - yr*tkz5 - zr*tky5
      &                         - 2.0d0*yr*zr*tukr
                dufld(6,k) = dufld(6,k) - zr*tkz5 - zr*zr*tukr
-               if (exchind) then
+               if (use_exind) then
                   term1 = rdmpik(5)*rrr1
                   term2 = rdmpik(7)*rrr1
                   drufld11i = -(xr*xr*term2*ukr - 2.0d0*xr*term1*ukx)
@@ -1006,7 +1006,7 @@ c
 c
 c     get the field gradient for exchange induction polarization force
 c
-               if (exchind) then
+               if (use_exind) then
                   term1 = rvalk*uir - rvali*ukr + (diuk + dkui)
                   term2 = -uir*dkr - dir*ukr + 2*(ukqi - uiqk)
                   term3 = uir*qkr - ukr*qir
@@ -1157,7 +1157,7 @@ c
                   frcx = frcx + wscale(kk)*depx
                   frcy = frcy + wscale(kk)*depy
                   frcz = frcz + wscale(kk)*depz
-                  if (exchind) then
+                  if (use_exind) then
                      term1 = uik
                      term2 = -uir*ukr
                      eterm = term1*rdmpik(3) + term2*rdmpik(5)

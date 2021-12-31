@@ -678,11 +678,11 @@ c
             corei = pcore(ii)
             vali = pval(ii)
             alphai = palpha(ii)
-         end if
-         if (use_exind) then
-            rsizi = sizpei(ii) / f
-            rdmpi = dmppei(ii)
-            rvali = elepei(ii)
+            if (use_exind) then
+               rsizi = sizpei(ii) / f
+               rdmpi = dmppei(ii)
+               rvali = elepei(ii)
+            end if
          end if
 c
 c     set exclusion coefficients for connected atoms
@@ -1440,7 +1440,7 @@ c
                fkp(1) = rr3*pix + rr5*pir*xr
                fkp(2) = rr3*piy + rr5*pir*yr
                fkp(3) = rr3*piz + rr5*pir*zr
-               if (use_exind) then
+               if (use_exind .and. use_chgpen) then
                   rsizk = sizpei(kk) / f
                   rdmpk = dmppei(kk)
                   rr1 = 1.0d0 / r
@@ -3317,6 +3317,9 @@ c
       use shunt
       use tarray
       use units
+c     modules for exind
+      use chgpot
+      use exind
       implicit none
       integer i,j,k,m
       integer ii,kk,kkk
@@ -3359,6 +3362,16 @@ c
       real*8, allocatable :: fieldtp(:,:)
       real*8, allocatable :: dlocal(:,:)
       character*6 mode
+c     variables for exind
+      real*8 f
+      real*8 frid(3),frkd(3)
+      real*8 rr9,rr11
+      real*8 rsizi,rsizk,rsizik
+      real*8 rvali,rvalk
+      real*8 rdmpi,rdmpk
+      real*8 rdmpik(7)
+      real*8, allocatable :: prscale(:)
+      real*8, allocatable :: wrscale(:)
 c
 c
 c     check for multipoles and set cutoff coefficients
@@ -3366,6 +3379,10 @@ c
       if (npole .eq. 0)  return
       mode = 'EWALD'
       call switch (mode)
+c
+c     set conversion factor
+c
+      f = sqrt(electric/dielec)
 c
 c     values for storage of mutual polarization intermediates
 c
@@ -3380,6 +3397,8 @@ c
       allocate (dscale(n))
       allocate (uscale(n))
       allocate (wscale(n))
+      allocate (prscale(n))
+      allocate (wrscale(n))
       allocate (fieldt(3,npole))
       allocate (fieldtp(3,npole))
       allocate (toffset(0:nthread-1))
@@ -3395,6 +3414,8 @@ c
          wscale(i) = 1.0d0
          dscale(i) = 1.0d0
          uscale(i) = 1.0d0
+         prscale(i) = 1.0d0
+         wrscale(i) = 1.0d0
       end do
 c
 c     initialize local variables for OpenMP calculation
@@ -3404,6 +3425,13 @@ c
             fieldt(j,ii) = 0.0d0
             fieldtp(j,ii) = 0.0d0
          end do
+      end do
+c
+c     zero out the value of the field due to exind at each site
+c
+      do j = 1, 3
+         frid(j) = 0.0d0
+         frkd(j) = 0.0d0
       end do
 c
 c     OpenMP directives for the major loop structure
@@ -3436,6 +3464,11 @@ c
             corei = pcore(ii)
             vali = pval(ii)
             alphai = palpha(ii)
+            if (use_exind) then
+               rsizi = sizpei(ii) / f
+               rdmpi = dmppei(ii)
+               rvali = elepei(ii)
+            end if
          end if
 c
 c     set exclusion coefficients for connected atoms
@@ -3443,39 +3476,55 @@ c
          if (dpequal) then
             do j = 1, n12(i)
                pscale(i12(j,i)) = p2scale
+               prscale(i12(j,i)) = pr2scale
                do k = 1, np11(i)
-                  if (i12(j,i) .eq. ip11(k,i))
-     &               pscale(i12(j,i)) = p2iscale
+                  if (i12(j,i) .eq. ip11(k,i)) then
+                     pscale(i12(j,i)) = p2iscale
+                     prscale(i12(j,i)) = pr2iscale
+                  end if
                end do
                dscale(i12(j,i)) = pscale(i12(j,i))
                wscale(i12(j,i)) = w2scale
+               wrscale(i12(j,i)) = wr2scale
             end do
             do j = 1, n13(i)
                pscale(i13(j,i)) = p3scale
+               prscale(i13(j,i)) = pr3scale
                do k = 1, np11(i)
-                  if (i13(j,i) .eq. ip11(k,i))
-     &               pscale(i13(j,i)) = p3iscale
+                  if (i13(j,i) .eq. ip11(k,i)) then
+                     pscale(i13(j,i)) = p3iscale
+                     prscale(i13(j,i)) = pr3iscale
+                  end if
                end do
                dscale(i13(j,i)) = pscale(i13(j,i))
                wscale(i13(j,i)) = w3scale
+               wrscale(i13(j,i)) = wr3scale
             end do
             do j = 1, n14(i)
                pscale(i14(j,i)) = p4scale
+               prscale(i14(j,i)) = pr4scale
                do k = 1, np11(i)
-                   if (i14(j,i) .eq. ip11(k,i))
-     &               pscale(i14(j,i)) = p4iscale
+                  if (i14(j,i) .eq. ip11(k,i)) then
+                     pscale(i14(j,i)) = p4iscale
+                     prscale(i14(j,i)) = pr4iscale
+                  endif
                end do
                dscale(i14(j,i)) = pscale(i14(j,i))
                wscale(i14(j,i)) = w4scale
+               wrscale(i14(j,i)) = wr4scale
             end do
             do j = 1, n15(i)
                pscale(i15(j,i)) = p5scale
+               prscale(i15(j,i)) = pr5scale
                do k = 1, np11(i)
-                  if (i15(j,i) .eq. ip11(k,i))
-     &               pscale(i15(j,i)) = p5iscale
+                  if (i15(j,i) .eq. ip11(k,i)) then
+                     pscale(i15(j,i)) = p5iscale
+                     prscale(i15(j,i)) = pr5iscale
+                  end if
                end do
                dscale(i15(j,i)) = pscale(i15(j,i))
                wscale(i15(j,i)) = w5scale
+               wrscale(i15(j,i)) = wr5scale
             end do
             do j = 1, np11(i)
                uscale(ip11(j,i)) = u1scale
@@ -3700,6 +3749,33 @@ c
                   fkp(3) = zr*(rr3*corei + rr3i*vali
      &                        + rr5i*dir + rr7i*qir)
      &                        - rr3i*diz - 2.0d0*rr5i*qiz
+                  if (use_exind) then
+                     rsizk = sizpei(kk) / f
+                     rdmpk = dmppei(kk)
+                     rvalk = elepei(kk)
+                     rr3 = rr2 * rr1
+                     call damprep (r,r2,rr1,rr3,rr5,rr7,rr9,rr11,
+     &                             7,rdmpi,rdmpk,rdmpik)
+                     rsizik = rsizi*rsizk * prscale(k)
+                     frid(1) = rsizik*(-xr*(rdmpik(3)*rvalk
+     &                      - rdmpik(5)*dkr + rdmpik(7)*qkr)
+     &                      - rdmpik(3)*dkx + 2.0d0*rdmpik(5)*qkx)*rr1
+                     frid(2) = rsizik*(-yr*(rdmpik(3)*rvalk
+     &                      - rdmpik(5)*dkr + rdmpik(7)*qkr)
+     &                      - rdmpik(3)*dky + 2.0d0*rdmpik(5)*qky)*rr1
+                     frid(3) = rsizik*(-zr*(rdmpik(3)*rvalk
+     &                      - rdmpik(5)*dkr + rdmpik(7)*qkr)
+     &                      - rdmpik(3)*dkz + 2.0d0*rdmpik(5)*qkz)*rr1
+                     frkd(1) = rsizik*(xr*(rdmpik(3)*rvali
+     &                      + rdmpik(5)*dir + rdmpik(7)*qir)
+     &                      - rdmpik(3)*dix - 2.0d0*rdmpik(5)*qix)*rr1
+                     frkd(2) = rsizik*(yr*(rdmpik(3)*rvali
+     &                      + rdmpik(5)*dir + rdmpik(7)*qir)
+     &                      - rdmpik(3)*diy - 2.0d0*rdmpik(5)*qiy)*rr1
+                     frkd(3) = rsizik*(zr*(rdmpik(3)*rvali
+     &                      + rdmpik(5)*dir + rdmpik(7)*qir)
+     &                      - rdmpik(3)*diz - 2.0d0*rdmpik(5)*qiz)*rr1
+                  end if
 c
 c     find terms needed later to compute mutual polarization
 c
@@ -3709,6 +3785,11 @@ c
                      rr3 = rr2 * rr1
                      rr3ik = dmpe(3) - (1.0d0-scalek*dmpik(3))*rr3
                      rr5ik = dmpe(5) - (1.0d0-scalek*dmpik(5))*rr5
+                     if (use_exind) then
+                        rsizik = rsizi*rsizk * wrscale(k) * rr1
+                        rr3ik = rr3ik + rdmpik(3)*rsizik
+                        rr5ik = rr5ik + rdmpik(5)*rsizik
+                     end if
                      nlocal = nlocal + 1
                      ilocal(1,nlocal) = ii
                      ilocal(2,nlocal) = kk
@@ -3724,10 +3805,10 @@ c
 c     increment the field at each site due to this interaction
 c
                do j = 1, 3
-                  fieldt(j,ii) = fieldt(j,ii) + fid(j)
-                  fieldt(j,kk) = fieldt(j,kk) + fkd(j)
-                  fieldtp(j,ii) = fieldtp(j,ii) + fip(j)
-                  fieldtp(j,kk) = fieldtp(j,kk) + fkp(j)
+                  fieldt(j,ii) = fieldt(j,ii) + fid(j) + frid(j)
+                  fieldt(j,kk) = fieldt(j,kk) + fkd(j) + frkd(j)
+                  fieldtp(j,ii) = fieldtp(j,ii) + fip(j) + frid(j)
+                  fieldtp(j,kk) = fieldtp(j,kk) + fkp(j) + frkd(j)
                end do
             end if
          end do
@@ -3739,21 +3820,29 @@ c
                pscale(i12(j,i)) = 1.0d0
                dscale(i12(j,i)) = 1.0d0
                wscale(i12(j,i)) = 1.0d0
+               prscale(i12(j,i)) = 1.0d0
+               wrscale(i12(j,i)) = 1.0d0
             end do
             do j = 1, n13(i)
                pscale(i13(j,i)) = 1.0d0
                dscale(i13(j,i)) = 1.0d0
                wscale(i13(j,i)) = 1.0d0
+               prscale(i13(j,i)) = 1.0d0
+               wrscale(i13(j,i)) = 1.0d0
             end do
             do j = 1, n14(i)
                pscale(i14(j,i)) = 1.0d0
                dscale(i14(j,i)) = 1.0d0
                wscale(i14(j,i)) = 1.0d0
+               prscale(i14(j,i)) = 1.0d0
+               wrscale(i14(j,i)) = 1.0d0
             end do
             do j = 1, n15(i)
                pscale(i15(j,i)) = 1.0d0
                dscale(i15(j,i)) = 1.0d0
                wscale(i15(j,i)) = 1.0d0
+               prscale(i15(j,i)) = 1.0d0
+               wrscale(i15(j,i)) = 1.0d0
             end do
             do j = 1, np11(i)
                uscale(ip11(j,i)) = 1.0d0
@@ -3845,6 +3934,8 @@ c
       deallocate (wscale)
       deallocate (dscale)
       deallocate (uscale)
+      deallocate (prscale)
+      deallocate (wrscale)
       deallocate (fieldt)
       deallocate (fieldtp)
       deallocate (toffset)

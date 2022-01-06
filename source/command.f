@@ -35,7 +35,10 @@ c
 c
 c     get the number of arguments and store each in a string
 c
+      ! Henry 20220106: As a library, iargc will return -1.
+      !                 This is the desired behavior.
       narg = iargc ()
+      print *, "narg read by tinker = ", narg
       if (narg .gt. maxarg)  narg = maxarg
       do i = 0, narg
          call getarg (i,arg(i))

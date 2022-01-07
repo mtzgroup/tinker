@@ -73,6 +73,11 @@ c
 c     test for user specified absence of a parameter file
 c
       if (.not. exist) then
+         ! Henry 20210106: If it cannot find the parameter file specified in keyfile,
+         !                 then die, rather than wait for an input
+         print *, "Cannot read parameter file!"
+         call fatal
+
          none = prmfile(1:4)
          call upcase (none)
          if (none .eq. 'NONE') then

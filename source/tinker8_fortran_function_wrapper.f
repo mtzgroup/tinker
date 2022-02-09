@@ -16,7 +16,7 @@ c
 c     Deal with fortran string, check xyzfile exist
 c
       xyzfile = transfer(xyzfile_c(1:xyzfile_string_length), xyzfile)
-      print *, "TC anchor: trying to read file ", xyzfile
+      print *, "TC anchor: trying to read xyz file"
       ! Henry 20220106: This is where keyfile is read in.
       ! basefile() -> getkey() -> keyline
       ! Parameter file is read in later from mechanic() -> field() -> getprm()

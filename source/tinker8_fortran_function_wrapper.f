@@ -16,6 +16,7 @@ c
 c     Deal with fortran string, check xyzfile exist
 c
       xyzfile = transfer(xyzfile_c(1:xyzfile_string_length), xyzfile)
+      print *, "TC anchor: trying to read file ", xyzfile
       ! Henry 20220106: This is where keyfile is read in.
       ! basefile() -> getkey() -> keyline
       ! Parameter file is read in later from mechanic() -> field() -> getprm()
@@ -23,6 +24,7 @@ c
       call suffix (xyzfile,'xyz','old')
       inquire (file=xyzfile,exist=exist)
       if (.not. exist)  call fatal
+      print *, "Successfully read xyz file"
 c
 c     first open and then read the Cartesian coordinates file
 c
